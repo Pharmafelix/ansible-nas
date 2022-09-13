@@ -446,3 +446,8 @@
       tags:
         - znc
       when: (znc_enabled | default(False))
+      
+    - role: vaultwarden
+      tags:
+        - vaultwarden
+      when: (vaultwarden_enabled | default(False))
