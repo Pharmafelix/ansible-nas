@@ -1,0 +1,99 @@
+---
+- name: Create a photoprism network
+  docker_network:
+    name: photoprism_network
+
+- name: Make sure the PhotoPrism MariaDB container is created and running
+  docker_container:
+    name: "photoprism-mariadb"
+    image: "mariadb:latest"
+    pull: yes
+    networks:
+      - name: photoprism_network
+    command: "mysqld --transaction-isolation=READ-COMMITTED --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --max-connections=512 --innodb-rollback-on-timeout=OFF --innodb-lock-wait-timeout=120"
+    state: 'started'
+    env:
+      "TZ": "{{ ansible_nas_timezone }}"
+      "MYSQL_ROOT_PASSWORD": "supersecret"
+      "MYSQL_DATABASE": "photoprism_DB"
+      "MYSQL_USER": "photoprism_user"
+      "MYSQL_PASSWORD": "supersecret"
+    volumes:
+      - "/mnt/Volume2/docker/photoprism/mariadb/mysql:/var/lib/mysql"
+    restart_policy: unless-stopped
+    
+
+- name: Make sure the Photoprism container is created and running
+  docker_container:
+    name: "photoprism"
+    image: photoprism/photoprism:latest
+    ports:
+      - 2342:2342
+    networks:
+      - name: photoprism_network
+    pull: yes
+    security_opts:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    state: 'started'
+    shm_size: 2G
+    env:
+      "PUID": "1000"
+      "PGID": "1000"
+      "PHOTOPRISM_GID": "1000"
+      "PHOTOPRISM_UID": "0"
+      "TZ": "{{ ansible_nas_timezone }}"
+      "PHOTOPRISM_ADMIN_PASSWORD": "{{ photoprism_admin_password }}"
+      "PHOTOPRISM_SITE_URL": "https://photoprism.{{ ansible_nas_domain }}"
+      "PHOTOPRISM_EXPERIMENTAL": "false"
+      "PHOTOPRISM_HTTP_HOST": "0.0.0.0"
+      "PHOTOPRISM_HTTP_PORT": "2342"
+      "PHOTOPRISM_HTTP_COMPRESSION": "gzip"
+      "PHOTOPRISM_DATABASE_DRIVER": "mysql"
+      "PHOTOPRISM_DATABASE_SERVER": "photoprism-mariadb:3306"
+      "PHOTOPRISM_DATABASE_NAME": "photoprism_DB"
+      "PHOTOPRISM_DATABASE_USER": "photoprism_user"
+      "PHOTOPRISM_DATABASE_PASSWORD": "{{ photoprism_database_password }}"
+      "PHOTOPRISM_DISABLE_CHOWN": "false"              
+      "PHOTOPRISM_DISABLE_BACKUPS": "true"            
+      "PHOTOPRISM_DISABLE_WEBDAV": "false"             
+      "PHOTOPRISM_DETECT_NSFW": "false"
+      "PHOTOPRISM_UPLOAD_NSFW": "true"
+      "PHOTOPRISM_THUMB_FILTER": "lanczos"
+      "PHOTOPRISM_THUMB_UNCACHED": "true"
+      "PHOTOPRISM_THUMB_SIZE": "2048"
+      "PHOTOPRISM_THUMB_SIZE_UNCACHED": "7680"           
+      "PHOTOPRISM_JPEG_SIZE": "7680" 
+      "PHOTOPRISM_JPEG_QUALITY": "92"
+      "TF_CPP_MIN_LOG_LEVEL": "0" 
+      "PHOTOPRISM_FFMPEG_ENCODER": "h264_qsv"
+      "PHOTOPRISM_FFMPEG_BUFFER": "64"
+      "PHOTOPRISM_INIT": "intel-graphics tensorflow-amd64-avx2" 
+    working_dir: "/mnt/Volume2/docker/photoprism"
+    devices:
+      - "/dev/dri/renderD128:/dev/dri/renderD128"
+      - "/dev/dri:/dev/dri"
+    volumes:
+      - "/mnt/Volume3/photos:/mnt/Volume2/docker/photoprism/originals"
+      - "/mnt/Volume3/photos/storage:/mnt/Volume2/docker/photoprism/storage"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "false"
+      traefik.http.routers.photoprism.entrypoints: "web"
+      traefik.http.middlewares.photoprism-https-redirect.redirectscheme.scheme: "https"
+      traefik.http.routers.photoprism.middlewares: "photoprism-https-redirect"
+      traefik.http.routers.photoprism-secure.entrypoints: "websecure"
+      traefik.http.routers.photoprism-secure.rule: "Host(`photoprism.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.photoprism-secure.tls: "true"
+      traefik.http.routers.photoprism-secure.tls.certresolver: "letsencrypt"
+#      traefik.http.routers.photoprism.middlewares: "my-auth@file"
+      traefik.http.services.photoprism-secure.loadbalancer.server.port: "2342"
+      traefik.docker.network: "photoprism_network"
+      traefik.port: "2342"
+
+- name: Schedule a library scan at 1 AM every day
+  cron:
+    name: Scan the PhotoPrism library
+    hour: "1"
+    minute: "0"
+    job: "/usr/bin/docker exec photoprism /photoprism/bin/photoprism index"

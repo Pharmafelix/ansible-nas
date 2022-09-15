@@ -1,0 +1,6 @@
+---
+container_name: photoprism
+
+url: "photoprism.{{ ansible_nas_domain }}"
+
+dashboard_name: "PhotoPrism"
