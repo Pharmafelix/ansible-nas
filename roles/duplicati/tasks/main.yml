@@ -33,12 +33,12 @@
           traefik.http.routers.duplicati.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.duplicati.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.duplicati.loadbalancer.server.port: "8200"
-  when: duplicati_enabled is true
+#  when: duplicati_enabled=true
 
-- name: Stop Duplicati
-  block:
-    - name: Stop Duplicati
-      docker_container:
-        name: "{{ duplicati_container_name }}"
-        state: absent
-  when: duplicati_enabled is false
+#- name: Stop Duplicati
+#  block:
+#    - name: Stop Duplicati
+#      docker_container:
+#        name: "{{ duplicati_container_name }}"
+#        state: absent
+#  when: duplicati_enabled=false
