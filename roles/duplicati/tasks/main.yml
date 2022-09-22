@@ -35,7 +35,7 @@
           traefik.http.services.duplicati.loadbalancer.server.port: "8200"
 #  when: duplicati_enabled=true
 
-#- name: Stop Duplicati
+# - name: Stop Duplicati
 #  block:
 #    - name: Stop Duplicati
 #      docker_container:

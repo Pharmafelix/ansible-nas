@@ -21,5 +21,5 @@ vaultwarden_allow_signups: "true"
 vaultwarden_memory: 1g
 vaultwarden_backup_memory: 1g
 
-#addon
+# addon
 vaultwarden_smtp_settings: "false"
