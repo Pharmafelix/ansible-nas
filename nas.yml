@@ -456,3 +456,4 @@
       tags:
         - photoprism
       when: (photoprism__enabled | default(False))
+      
