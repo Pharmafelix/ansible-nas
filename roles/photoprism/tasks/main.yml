@@ -1,4 +1,12 @@
 ---
+- name: Create Photoprism Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ photoprism_data_directory }}/photoprism" 
+    - "{{ photoprism_data_directory }}/storage" 
+
 - name: Create a photoprism network
   docker_network:
     name: photoprism_network
@@ -14,12 +22,12 @@
     state: 'started'
     env:
       "TZ": "{{ ansible_nas_timezone }}"
-      "MYSQL_ROOT_PASSWORD": "supersecret"
+      "MYSQL_ROOT_PASSWORD": "{{ photoprism_MYSQL_ROOT_PASSWORD }}"
       "MYSQL_DATABASE": "photoprism_DB"
-      "MYSQL_USER": "photoprism_user"
-      "MYSQL_PASSWORD": "supersecret"
+      "MYSQL_USER": "photoprism_user" 
+      "MYSQL_PASSWORD": "{{ photoprism_MYSQL_PASSWORD }}"
     volumes:
-      - "/mnt/Volume2/docker/photoprism/mariadb/mysql:/var/lib/mysql"
+      - "{{ docker_home }}/photoprism/mariadb/mysql:/var/lib/mysql"
     restart_policy: unless-stopped
     
 
@@ -38,12 +46,12 @@
     state: 'started'
     shm_size: 2G
     env:
-      "PUID": "1000"
-      "PGID": "1000"
-      "PHOTOPRISM_GID": "1000"
-      "PHOTOPRISM_UID": "0"
+      "PUID": "0"   #maybe change it to 1000 after initialization needs testing
+      "PGID": "0"   #maybe change it to 1000 after initialization needs testing
+      "PHOTOPRISM_GID": "0"   #maybe change it to 1000 after initialization needs testing
+      "PHOTOPRISM_UID": "0"   #maybe change it to 1000 after initialization needs testing
       "TZ": "{{ ansible_nas_timezone }}"
-      "PHOTOPRISM_ADMIN_PASSWORD": "{{ photoprism_admin_password }}"
+      "PHOTOPRISM_ADMIN_PASSWORD": "{{ photoprism_PHOTOPRISM_ADMIN_PASSWORD }}"   #add variables
       "PHOTOPRISM_SITE_URL": "https://photoprism.{{ ansible_nas_domain }}"
       "PHOTOPRISM_EXPERIMENTAL": "false"
       "PHOTOPRISM_HTTP_HOST": "0.0.0.0"
@@ -53,10 +61,10 @@
       "PHOTOPRISM_DATABASE_SERVER": "photoprism-mariadb:3306"
       "PHOTOPRISM_DATABASE_NAME": "photoprism_DB"
       "PHOTOPRISM_DATABASE_USER": "photoprism_user"
-      "PHOTOPRISM_DATABASE_PASSWORD": "{{ photoprism_database_password }}"
+      "PHOTOPRISM_DATABASE_PASSWORD": "{{ photoprism_MYSQL_PASSWORD }}"
       "PHOTOPRISM_DISABLE_CHOWN": "false"              
       "PHOTOPRISM_DISABLE_BACKUPS": "true"            
-      "PHOTOPRISM_DISABLE_WEBDAV": "false"             
+      "PHOTOPRISM_DISABLE_WEBDAV": "true"             
       "PHOTOPRISM_DETECT_NSFW": "false"
       "PHOTOPRISM_UPLOAD_NSFW": "true"
       "PHOTOPRISM_THUMB_FILTER": "lanczos"
@@ -69,27 +77,21 @@
       "PHOTOPRISM_FFMPEG_ENCODER": "h264_qsv"
       "PHOTOPRISM_FFMPEG_BUFFER": "64"
       "PHOTOPRISM_INIT": "intel-graphics tensorflow-amd64-avx2" 
-    working_dir: "/mnt/Volume2/docker/photoprism"
+    working_dir: "/photoprism"
     devices:
       - "/dev/dri/renderD128:/dev/dri/renderD128"
       - "/dev/dri:/dev/dri"
     volumes:
-      - "/mnt/Volume3/photos:/mnt/Volume2/docker/photoprism/originals"
-      - "/mnt/Volume3/photos/storage:/mnt/Volume2/docker/photoprism/storage"
+      - "{{ photoprism_data_directory }}/photoprism:/photoprism/originals:rw"
+      - "{{ photoprism_data_directory }}/storage:/photoprism/storage:rw"
     restart_policy: unless-stopped
     labels:
-      traefik.enable: "false"
-      traefik.http.routers.photoprism.entrypoints: "web"
-      traefik.http.middlewares.photoprism-https-redirect.redirectscheme.scheme: "https"
-      traefik.http.routers.photoprism.middlewares: "photoprism-https-redirect"
-      traefik.http.routers.photoprism-secure.entrypoints: "websecure"
-      traefik.http.routers.photoprism-secure.rule: "Host(`photoprism.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.photoprism-secure.tls: "true"
-      traefik.http.routers.photoprism-secure.tls.certresolver: "letsencrypt"
-#      traefik.http.routers.photoprism.middlewares: "my-auth@file"
-      traefik.http.services.photoprism-secure.loadbalancer.server.port: "2342"
-      traefik.docker.network: "photoprism_network"
-      traefik.port: "2342"
+      traefik.enable: "{{ photoprism_available_externally | string }}"
+      traefik.http.routers.photoprism.rule: "Host(`photoprism.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.photoprism.tls.certresolver: "letsencrypt"
+      traefik.http.routers.photoprism.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.photoprism.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.photoprism.loadbalancer.server.port: "2342"
 
 - name: Schedule a library scan at 1 AM every day
   cron:

@@ -1,6 +1,6 @@
 ---
-container_name: photoprism
-
-url: "photoprism.{{ ansible_nas_domain }}"
+# enable or disable the application
+photoprism_enabled: false
+photoprism_available_externally: false
 
 dashboard_name: "PhotoPrism"

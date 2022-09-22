@@ -454,3 +454,8 @@
       tags:
         - vaultwarden
       when: (vaultwarden_enabled | default(False))
+
+    - role: photoprism
+      tags:
+        - photoprism
+      when: (photoprism__enabled | default(False))
