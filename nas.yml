@@ -1,13 +1,6 @@
 ---
 - hosts: all
 
-#  pre_tasks:
-#    - import_tasks: tasks/users.yml
-#      tags: users
-
-#  vars_files:
-#    - "/home/felix/ansible-nas/inventories/my-ansible-nas/group_vars/nas.yml"
-
   roles:
     ###
     ### Requirements
@@ -453,7 +446,7 @@
       tags:
         - znc
       when: (znc_enabled | default(False))
-      
+
     - role: vaultwarden
       tags:
         - vaultwarden

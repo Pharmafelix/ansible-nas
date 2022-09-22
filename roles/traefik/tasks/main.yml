@@ -12,7 +12,7 @@
     src: traefik.toml
     dest: "{{ traefik_data_directory }}/traefik.toml"
   register: template_config
-  
+
 - name: Template Traefik dynamic.toml
   template:
     src: dynamic.toml

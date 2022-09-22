@@ -4,8 +4,8 @@
     path: "{{ item }}"
     state: directory
   with_items:
-    - "{{ photoprism_data_directory }}/photoprism" 
-    - "{{ photoprism_data_directory }}/storage" 
+    - "{{ photoprism_data_directory }}/photoprism"
+    - "{{ photoprism_data_directory }}/storage"
 
 - name: Create a photoprism network
   docker_network:
@@ -24,12 +24,11 @@
       "TZ": "{{ ansible_nas_timezone }}"
       "MYSQL_ROOT_PASSWORD": "{{ photoprism_MYSQL_ROOT_PASSWORD }}"
       "MYSQL_DATABASE": "photoprism_DB"
-      "MYSQL_USER": "photoprism_user" 
+      "MYSQL_USER": "photoprism_user"
       "MYSQL_PASSWORD": "{{ photoprism_MYSQL_PASSWORD }}"
     volumes:
       - "{{ docker_home }}/photoprism/mariadb/mysql:/var/lib/mysql"
     restart_policy: unless-stopped
-    
 
 - name: Make sure the Photoprism container is created and running
   docker_container:
@@ -46,12 +45,12 @@
     state: 'started'
     shm_size: 2G
     env:
-      "PUID": "0"   #maybe change it to 1000 after initialization needs testing
-      "PGID": "0"   #maybe change it to 1000 after initialization needs testing
-      "PHOTOPRISM_GID": "0"   #maybe change it to 1000 after initialization needs testing
-      "PHOTOPRISM_UID": "0"   #maybe change it to 1000 after initialization needs testing
+      "PUID": "0"   # maybe change it to 1000 after initialization needs testing
+      "PGID": "0"   # maybe change it to 1000 after initialization needs testing
+      "PHOTOPRISM_GID": "0"   # maybe change it to 1000 after initialization needs testing
+      "PHOTOPRISM_UID": "0"   # maybe change it to 1000 after initialization needs testing
       "TZ": "{{ ansible_nas_timezone }}"
-      "PHOTOPRISM_ADMIN_PASSWORD": "{{ photoprism_PHOTOPRISM_ADMIN_PASSWORD }}"   #add variables
+      "PHOTOPRISM_ADMIN_PASSWORD": "{{ photoprism_PHOTOPRISM_ADMIN_PASSWORD }}"
       "PHOTOPRISM_SITE_URL": "https://photoprism.{{ ansible_nas_domain }}"
       "PHOTOPRISM_EXPERIMENTAL": "false"
       "PHOTOPRISM_HTTP_HOST": "0.0.0.0"
@@ -62,21 +61,21 @@
       "PHOTOPRISM_DATABASE_NAME": "photoprism_DB"
       "PHOTOPRISM_DATABASE_USER": "photoprism_user"
       "PHOTOPRISM_DATABASE_PASSWORD": "{{ photoprism_MYSQL_PASSWORD }}"
-      "PHOTOPRISM_DISABLE_CHOWN": "false"              
-      "PHOTOPRISM_DISABLE_BACKUPS": "true"            
-      "PHOTOPRISM_DISABLE_WEBDAV": "true"             
+      "PHOTOPRISM_DISABLE_CHOWN": "false"        
+      "PHOTOPRISM_DISABLE_BACKUPS": "true"
+      "PHOTOPRISM_DISABLE_WEBDAV": "true"
       "PHOTOPRISM_DETECT_NSFW": "false"
       "PHOTOPRISM_UPLOAD_NSFW": "true"
       "PHOTOPRISM_THUMB_FILTER": "lanczos"
       "PHOTOPRISM_THUMB_UNCACHED": "true"
       "PHOTOPRISM_THUMB_SIZE": "2048"
-      "PHOTOPRISM_THUMB_SIZE_UNCACHED": "7680"           
-      "PHOTOPRISM_JPEG_SIZE": "7680" 
+      "PHOTOPRISM_THUMB_SIZE_UNCACHED": "7680"         
+      "PHOTOPRISM_JPEG_SIZE": "7680"
       "PHOTOPRISM_JPEG_QUALITY": "92"
-      "TF_CPP_MIN_LOG_LEVEL": "0" 
+      "TF_CPP_MIN_LOG_LEVEL": "0"
       "PHOTOPRISM_FFMPEG_ENCODER": "h264_qsv"
       "PHOTOPRISM_FFMPEG_BUFFER": "64"
-      "PHOTOPRISM_INIT": "intel-graphics tensorflow-amd64-avx2" 
+      "PHOTOPRISM_INIT": "intel-graphics tensorflow-amd64-avx2"
     working_dir: "/photoprism"
     devices:
       - "/dev/dri/renderD128:/dev/dri/renderD128"
