@@ -455,4 +455,9 @@
     - role: photoprism
       tags:
         - photoprism
-      when: (photoprism__enabled | default(False))
+      when: (photoprism_enabled | default(False))
+
+    - role: monica
+      tags:
+        - monica
+      when: (monica_enabled | default(False))

@@ -1,0 +1,25 @@
+---
+monica_enabled: true
+monica_available_externally: false
+
+# directories
+monica_config_directory: "{{ docker_home }}/monica/config"
+monica_data_directory: "{{ docker_home }}/monica/data"
+
+# uid / gid
+monica_user_id: "1000"
+monica_group_id: "1000"
+monica_mysql_user: "monica-mysql"
+monica_mysql_password: "secret"
+monica_app_key: "32letterslongnospecialssigns"
+
+# network
+monica_hostname: "monica"
+monica_port: "8080"
+monica_container_network_name: "monica_network"
+
+# specs
+monica_memory: "2g"
+monica_mysql_memory: "1g"
+
+monica_version: "latest"
