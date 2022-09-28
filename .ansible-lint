@@ -8,6 +8,7 @@ exclude_paths:
  - roles/bertvv.samba
  - roles/geerlingguy.docker
  - roles/geerlingguy.nfs
+ - roles/authentik
 
 mock_modules:
  - docker_container
