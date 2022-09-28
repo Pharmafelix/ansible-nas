@@ -1,3 +1,0 @@
-[http.middlewares.my-auth.basicAuth]
-    realm = "Traefik2 Basic Auth"
-    usersFile = "/etc/traefik/usersFile"

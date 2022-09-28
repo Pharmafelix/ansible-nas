@@ -8,7 +8,8 @@
   raw: apt-add-repository universe
   register: add_repo_result
   changed_when: "'distribution component enabled for all sources' in add_repo_result.stdout"
-  until: add_repo_result.rc == 0
+  # until: add_repo_result.rc == 0
+  until: add_repo_result is succeeded
   retries: 3
   delay: 1
 

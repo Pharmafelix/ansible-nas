@@ -49,10 +49,6 @@
       tags:
         - bazarr
 
-    - role: bitwarden
-      tags:
-        - bitwarden
-
     - role: booksonic
       tags:
         - booksonic
@@ -292,11 +288,6 @@
         - paperless_ng
       when: (paperless_ng_enabled | default(False))
 
-    - role: piwigo
-      tags:
-        - piwigo
-      when: (piwigo_enabled | default(False))
-
     - role: plex
       tags:
         - plex
@@ -461,3 +452,8 @@
       tags:
         - monica
       when: (monica_enabled | default(False))
+
+    - role: authentik
+      tags:
+        - authentik
+      when: (authentik_enabled | default(False))

@@ -1,5 +1,5 @@
 ---
-monica_enabled: true
+monica_enabled: false
 monica_available_externally: false
 
 # directories
@@ -15,7 +15,7 @@ monica_app_key: "32letterslongnospecialssigns"
 
 # network
 monica_hostname: "monica"
-monica_port: "8080"
+monica_port: "8095"
 monica_container_network_name: "monica_network"
 
 # specs

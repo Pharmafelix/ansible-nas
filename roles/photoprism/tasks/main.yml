@@ -91,6 +91,7 @@
       traefik.http.routers.photoprism.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.photoprism.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
       traefik.http.services.photoprism.loadbalancer.server.port: "2342"
+      traefik.http.routers.photoprism.middlewares: "cloudflare-ipwhitelist@file"
 
 - name: Schedule a library scan at 1 AM every day
   cron:

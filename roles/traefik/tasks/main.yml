@@ -7,23 +7,17 @@
     - "{{ traefik_data_directory }}"
     - "{{ traefik_data_directory }}/letsencrypt"
 
-- name: Template Traefik config.toml
+- name: Template Traefik config.yml
   template:
-    src: traefik.toml
-    dest: "{{ traefik_data_directory }}/traefik.toml"
+    src: traefik.yml
+    dest: "{{ traefik_data_directory }}/traefik.yml"
   register: template_config
 
-- name: Template Traefik dynamic.toml
+- name: Template Traefik dynamic.yml
   template:
-    src: dynamic.toml
-    dest: "{{ traefik_data_directory }}/dynamic.toml"
+    src: dynamic.yml
+    dest: "{{ traefik_data_directory }}/dynamic.yml"
   register: dynamic_template_config
-
-- name: Usersfile for basic auth
-  template:
-    src: usersFile
-    dest: "{{ traefik_data_directory }}/usersFile"
-  register: usersfile_basicauth_config
 
 - name: Traefik Docker Container
   docker_container:
@@ -32,10 +26,9 @@
     pull: true
     network_mode: host
     volumes:
-      - "{{ traefik_data_directory }}/traefik.toml:/etc/traefik/traefik.toml:ro"
+      - "{{ traefik_data_directory }}/traefik.yml:/etc/traefik/traefik.yml:ro"
       - "{{ traefik_data_directory }}/letsencrypt:/letsencrypt:rw"
-      - "{{ traefik_data_directory }}/dynamic.toml:/etc/traefik/dynamic.toml:ro"
-      - "{{ traefik_data_directory }}/usersFile:/etc/traefik/usersFile:ro"
+      - "{{ traefik_data_directory }}/dynamic.yml:/etc/traefik/dynamic.yml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     env: "{{ traefik_environment_variables }}"
     restart_policy: unless-stopped

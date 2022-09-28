@@ -25,7 +25,7 @@ traefik_environment_variables:
 # Ansible-NAS requests a wildcard certificate for your domain, so there should be no reason to have to use the staging
 # letsencrypt acme server. If you do want to flip between staging/production, you might need to stop Traefik and clear
 # the "{{ docker_home }}/traefik" after changing this setting.
-# traefik_acme_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # staging
+#traefik_acme_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # staging
 traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory" # production
 
 # specs
